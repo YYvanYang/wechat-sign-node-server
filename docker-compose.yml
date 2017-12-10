@@ -1,0 +1,27 @@
+version: "2"
+services:
+  node:
+    image: "node:8"
+    container_name: ${NODE_SERVER_CONTAINER_NAME}
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+      - VIRTUAL_HOST=${DOMAINS}
+      - LETSENCRYPT_HOST=${DOMAINS}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL} 
+    restart: always
+    expose:
+      - "10030"
+    volumes:
+      - ./:/home/node/app
+    command: "npm start"
+    depends_on:
+      - redis
+  redis:
+    image: redis
+
+networks:
+  default:
+    external:
+      name: ${NETWORK}
