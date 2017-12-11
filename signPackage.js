@@ -70,7 +70,8 @@ async function getJsApiTicket () {
 
  async function getSignPackage(url) {
     const jsapi_ticket = await getJsApiTicket()
-    return sign(jsapi_ticket, url)
+    let _sign = sign(jsapi_ticket, url)
+    return { ..._sign, appId: process.env.APPID }
  }
 
 module.exports = getSignPackage

@@ -2,6 +2,7 @@ const Koa = require('koa');
 const app = new Koa();
 const compose = require('koa-compose');
 const logger = require('koa-logger');
+const View = require('./view');
 
 const path = require('path');
 const serve = require('koa-static');
@@ -43,7 +44,13 @@ app.use(async function(ctx, next) {
 
 async function home(ctx, next) {
   if ('/' == ctx.path) {
-    ctx.body = 'Hello, master!';
+    ctx.type = 'html';
+
+    let url = ctx.href.split('#')[0]
+    url = url.replace(/^http:/i, 'https:')
+
+    const signPackage = await getSignPackage(url);
+    ctx.body = new View(ctx, signPackage);
   } else {
     await next();
   }
