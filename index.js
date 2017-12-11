@@ -43,8 +43,7 @@ async function wechatSign(ctx, next) {
       ctx.throw(400, 'url querystring required!');
       return
     }
-    const signPackage = getSignPackage(url);
-    // TODO: cannot return JSON
+    const signPackage = await getSignPackage(url);
     ctx.body = signPackage
   } else {
     await next();
