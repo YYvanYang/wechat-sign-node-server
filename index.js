@@ -1,6 +1,7 @@
 const Koa = require('koa');
 const app = new Koa();
 const compose = require('koa-compose');
+const logger = require('koa-logger');
 
 const path = require('path');
 const serve = require('koa-static');
@@ -26,7 +27,19 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}`);
 });
 
+// log requests
+
+app.use(logger());
+
 // response
+
+// custom 404
+
+app.use(async function(ctx, next) {
+  await next();
+  if (ctx.body || !ctx.idempotent) return;
+  ctx.redirect('/404.html');
+});
 
 async function home(ctx, next) {
   if ('/' == ctx.path) {
@@ -50,16 +63,7 @@ async function wechatSign(ctx, next) {
   }
 }
 
-async function notfound(ctx, next) {
-  let whitelist = ['/', '/wechat-sign']
-  if (whitelist.indexOf(ctx.path) === -1) {
-    ctx.throw(404);
-  } else {
-    await next();
-  }
-};
-
-const all = compose([home, wechatSign, notfound]);
+const all = compose([home, wechatSign]);
 
 app.use(all);
 
