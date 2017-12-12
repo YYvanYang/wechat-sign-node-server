@@ -2,7 +2,7 @@ const Koa = require('koa');
 const app = new Koa();
 const compose = require('koa-compose');
 const logger = require('koa-logger');
-const View = require('./view');
+const render = require('./lib/render');
 
 const path = require('path');
 const serve = require('koa-static');
@@ -11,6 +11,10 @@ const publicFiles = serve(path.join(__dirname, 'public'));
 publicFiles._name = 'static /public';
 
 app.use(publicFiles);
+
+app.use(logger());
+
+app.use(render);
 
 // x-response-time
 app.use(async (ctx, next) => {
@@ -28,10 +32,6 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}`);
 });
 
-// log requests
-
-app.use(logger());
-
 // response
 
 // custom 404
@@ -44,13 +44,11 @@ app.use(async function(ctx, next) {
 
 async function home(ctx, next) {
   if ('/' == ctx.path) {
-    ctx.type = 'html';
-
     let url = ctx.href.split('#')[0]
     url = url.replace(/^http:/i, 'https:')
 
     const signPackage = await getSignPackage(url);
-    ctx.body = new View(ctx, signPackage);
+    await ctx.render('index', { signPackage });
   } else {
     await next();
   }
