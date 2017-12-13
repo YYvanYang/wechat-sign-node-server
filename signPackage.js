@@ -32,8 +32,7 @@ async function getAccessToken () {
 
     let result = await rp(options)
 
-    client.set('accessToken', result.access_token);
-    client.expire('jsapiTicket', 7000);
+    client.set('accessToken', result.access_token, 'EX', 7000);
     
     return result.access_token;
  }
@@ -61,8 +60,7 @@ async function getJsApiTicket () {
 
     let result = await rp(options)
 
-    client.set('jsapiTicket', result.ticket);
-    client.expire('jsapiTicket', 7000);
+    client.set('jsapiTicket', result.ticket, 'EX', 7000);
     
     return result.ticket;
 
